@@ -1,10 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:todo_app/constants/colors.dart';
+import 'package:todo_app/model/todo.dart';
 import 'package:todo_app/widgets/todo_item.dart';
 
 class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+  Home({Key? key}) : super(key: key);
+
+  final todosList = ToDo.todoList();
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +28,10 @@ class Home extends StatelessWidget {
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
                   ),
                 ),
-                TodoItem(),
-                TodoItem(),
-                TodoItem(),
-                TodoItem(),
+                for (ToDo _todo in todosList)
+                  ToDoItem(
+                    todo: _todo,
+                  )
               ],
             ))
           ]),
