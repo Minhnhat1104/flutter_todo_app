@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_app/constants/colors.dart';
 import 'package:todo_app/model/todo.dart';
+import 'package:todo_app/screens/home.dart';
 
 class ToDoItem extends StatelessWidget {
   final ToDo todo;
@@ -15,6 +16,10 @@ class ToDoItem extends StatelessWidget {
       required this.onToDoChanged,
       required this.onDeleteItem})
       : super(key: key);
+
+  String _formatDate(DateTime? date) {
+    return '${date!.day.toString().padLeft(2, '0')}/${date!.month.toString().padLeft(2, '0')}/${date!.year}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +36,25 @@ class ToDoItem extends StatelessWidget {
         leading: Icon(
             todo.isDone ? Icons.check_box : Icons.check_box_outline_blank,
             color: tdBlue),
-        title: Text(
-          todo.todoText!,
-          style: TextStyle(
-              fontSize: 16,
-              color: tdBlack,
-              decoration: todo.isDone ? TextDecoration.lineThrough : null),
+        title: Row(
+          children: [
+            Expanded(
+                child: Text(
+              todo.todoText!,
+              style: TextStyle(
+                  fontSize: 16,
+                  color: tdBlack,
+                  decoration: todo.isDone ? TextDecoration.lineThrough : null),
+            )),
+            if (todo.time != null) // Check if time is not null
+              Text(
+                '${_formatDate(todo.date)} ${todo.time!.hour}:${todo.time!.minute}', // Display time
+                style: TextStyle(
+                  fontSize: 14,
+                  color: tdBlack,
+                ),
+              ),
+          ],
         ),
         trailing: Container(
           padding: EdgeInsets.all(0),

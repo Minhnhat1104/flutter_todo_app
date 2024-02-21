@@ -1,4 +1,6 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:todo_app/constants/colors.dart';
 import 'package:todo_app/model/todo.dart';
@@ -18,6 +20,8 @@ class _HomeState extends State<Home> {
   List<ToDo> _foundToDo = [];
   final _todoController = TextEditingController();
   RadioOption? _radioValue = RadioOption.all;
+  TimeOfDay? selectedTime;
+  DateTime? selectedDate;
 
   @override
   void initState() {
@@ -88,6 +92,43 @@ class _HomeState extends State<Home> {
                 Container(
                   margin: EdgeInsets.only(bottom: 20, right: 20),
                   child: ElevatedButton(
+                    child: Text(
+                        selectedTime != null && selectedDate != null
+                            ? "${_formatDate(selectedDate)} ${selectedTime!.hour}:${selectedTime!.minute}"
+                            : 'Select Time',
+                        style: TextStyle(fontSize: 20, color: Colors.white)),
+                    onPressed: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2101),
+                      );
+
+                      if (pickedDate != null) {
+                        final TimeOfDay? timeOfDay = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                            initialEntryMode: TimePickerEntryMode.dial);
+
+                        if (timeOfDay != null) {
+                          setState(() {
+                            selectedDate = pickedDate;
+                            selectedTime = timeOfDay;
+                          });
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: tdBlue,
+                      minimumSize: Size(60, 60),
+                      elevation: 10,
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(bottom: 20, right: 20),
+                  child: ElevatedButton(
                     child: Text('+',
                         style: TextStyle(fontSize: 40, color: Colors.white)),
                     onPressed: _handleAddItem,
@@ -120,7 +161,12 @@ class _HomeState extends State<Home> {
     setState(() {
       todosList.add(ToDo(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
-          todoText: _todoController.text));
+          todoText: _todoController.text,
+          date: selectedDate,
+          time: selectedTime));
+
+      selectedDate = null;
+      selectedTime = null;
     });
 
     _todoController.clear();
@@ -141,6 +187,22 @@ class _HomeState extends State<Home> {
       _foundToDo = results;
     });
   }
+
+  String _formatDate(DateTime? date) {
+    return '${date!.day.toString().padLeft(2, '0')}/${date!.month.toString().padLeft(2, '0')}/${date!.year}';
+  }
+
+  List<ToDo> _radioFilter(List<ToDo> todoList) {
+    return todoList.where((element) {
+      if (_radioValue == RadioOption.all) {
+        return true;
+      } else if (_radioValue == RadioOption.today) {}
+
+      return true;
+    }).toList();
+  }
+
+  double timeToDouble(TimeOfDay myTime) => myTime.hour + myTime.minute / 60.0;
 
   Widget searchBox() {
     return Container(
