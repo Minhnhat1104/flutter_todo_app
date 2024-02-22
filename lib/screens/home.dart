@@ -132,7 +132,9 @@ class _HomeState extends State<Home> {
                   child: ElevatedButton(
                     child: Text('+',
                         style: TextStyle(fontSize: 40, color: Colors.white)),
-                    onPressed: _handleAddItem,
+                    onPressed: selectedDate == null || selectedTime == null
+                        ? null
+                        : _handleAddItem,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: tdBlue,
                       minimumSize: Size(60, 60),
