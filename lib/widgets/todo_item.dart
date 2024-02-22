@@ -48,7 +48,7 @@ class ToDoItem extends StatelessWidget {
             )),
             if (todo.time != null) // Check if time is not null
               Text(
-                '${_formatDate(todo.date)} ${todo.time!.hour}:${todo.time!.minute}', // Display time
+                '${_formatDate(todo.time)} ${todo.time!.hour}:${todo.time!.minute}', // Display time
                 style: TextStyle(
                   fontSize: 14,
                   color: tdBlack,

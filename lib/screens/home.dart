@@ -54,7 +54,8 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     // when add, item is add at bottom, so it need to reversed
-                    for (ToDo _todo in _foundToDo.reversed)
+                    for (ToDo _todo
+                        in filterWrapper(_foundToDo.reversed.toList()))
                       ToDoItem(
                         todo: _todo,
                         onToDoChanged: _handleTodoChange,
@@ -162,8 +163,8 @@ class _HomeState extends State<Home> {
       todosList.add(ToDo(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           todoText: _todoController.text,
-          date: selectedDate,
-          time: selectedTime));
+          time: DateTime(selectedDate!.year, selectedDate!.month,
+              selectedDate!.day, selectedTime!.hour, selectedTime!.minute)));
 
       selectedDate = null;
       selectedTime = null;
@@ -188,8 +189,50 @@ class _HomeState extends State<Home> {
     });
   }
 
+  List<ToDo> filterWrapper(List<ToDo> list) {
+    return list.where((element) {
+      if (_radioValue == RadioOption.all) {
+        return true;
+      } else if (_radioValue == RadioOption.today) {
+        return compareDateTime(element.time) == 0;
+      } else if (_radioValue == RadioOption.upcoming) {
+        return compareDateTime(element.time) == 1;
+      } else {
+        return true;
+      }
+    }).toList();
+  }
+
   String _formatDate(DateTime? date) {
     return '${date!.day.toString().padLeft(2, '0')}/${date!.month.toString().padLeft(2, '0')}/${date!.year}';
+  }
+
+  int compareDateTime(DateTime? date) {
+    DateTime now = DateTime.now();
+
+    // Extract date components for comparison
+    int inputYear = date!.year;
+    int inputMonth = date!.month;
+    int inputDay = date!.day;
+
+    int currentYear = now.year;
+    int currentMonth = now.month;
+    int currentDay = now.day;
+
+    // Compare date components
+    if (inputYear < currentYear ||
+        (inputYear == currentYear && inputMonth < currentMonth) ||
+        (inputYear == currentYear &&
+            inputMonth == currentMonth &&
+            inputDay < currentDay)) {
+      return -1; // Input is in the past
+    } else if (inputYear == currentYear &&
+        inputMonth == currentMonth &&
+        inputDay == currentDay) {
+      return 0; // Input is on the current day
+    } else {
+      return 1; // Input is in the future
+    }
   }
 
   List<ToDo> _radioFilter(List<ToDo> todoList) {
